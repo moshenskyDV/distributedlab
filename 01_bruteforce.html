@@ -1,0 +1,83 @@
+<!-- HOW TO USE: -->
+<!-- Download this file and open it using modern browser (chrome, firefox, ie etc.) -->
+<!-- It will be difficult to bruteforce 64+ hash length, because of browser/library performance -->
+
+<html>
+<head>
+<script src='https://cdn.jsdelivr.net/npm/bignumber.js@9.0.2/bignumber.min.js'></script>
+</head>
+<body>
+<div>
+1. Количество вариантов ключей для битовой последовательности разной длины:
+<br>
+<table width="100%" border="1" id="task1">
+  <tr><td>Длинна ключа (бит)</td><td>Попробовать брутфорс</td><td>Количество комбинаций</td></tr>
+</table>
+
+</div>
+<br><br>
+<div>
+2,3. Брутфорс (чтобы сгеренировать случайный хеш и попытаться его сбрутить - нажмите на кнопку "bruteforce" выше напротив интересующей вас длины.
+
+<div>Сгенерированный хеш: <span id="bruteforceHash"></span></div>
+<div id="bruteforceStatus"></div>
+<div id="bruteforceFoundValue"></div>
+<div id="bruteforceTime"></div>
+</div>
+<script>
+const lengths = [8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096];
+const getAmountOfKeys = (length) => {
+    const bigNumber = new BigNumber(2);
+    return bigNumber.exponentiatedBy(length).toFixed();
+}
+
+const tableTask1 = document.getElementById('task1');
+for (const length of lengths) {
+    const row = document.createElement('tr');
+    row.innerHTML = `<td>${length}</td><td><button onClick='bruteforce(${length})'>Bruteforce</button></td><td>${getAmountOfKeys(length)}</td>`;
+    tableTask1.appendChild(row);
+}
+
+const bruteforceHash = document.getElementById('bruteforceHash');
+const bruteforceStatus = document.getElementById('bruteforceStatus');
+const bruteforceFoundValue = document.getElementById('bruteforceFoundValue');
+const bruteforceTime = document.getElementById('bruteforceTime');
+
+const randomizer = (length) => {
+    const array = new Uint8Array(length / 8);
+    crypto.getRandomValues(array);
+    
+    let res = new BigNumber(0);
+    for (let [i, val] of array.entries()) {
+        let intermediateBigNumber = new BigNumber(val);
+        for (let j = 1; j <= i; j++) {
+            intermediateBigNumber = intermediateBigNumber.multipliedBy(256);
+        }
+        res = res.plus(intermediateBigNumber);
+    }
+    return res;
+}
+
+const bruteforce = (length) => {
+    const randomValue = randomizer(length);
+    bruteforceHash.innerHTML = `0x${randomValue.toString(16).padStart(length / 4, '0')}`;
+    bruteforceStatus.innerHTML = 'Pending... (please w8 for results)';
+    bruteforceTime.innerHTML = '';
+    bruteforceFoundValue.innerHTML = '';
+    let hash = new BigNumber(0);
+    const timeStart = Date.now();
+    //block (loop) main thread to avoid unfinished results
+    //it will not allow to user to press anything on page until finished
+    setTimeout(() => {
+      while (hash.comparedTo(randomValue)){
+        hash = hash.plus(new BigNumber(1));
+      }
+      const timeEnd = Date.now();
+      bruteforceFoundValue.innerHTML = `0x${hash.toString(16).padStart(length / 4, '0')}`;
+      bruteforceStatus.innerHTML = 'Done!';
+      bruteforceTime.innerHTML = `${timeEnd - timeStart} milliseconds`;
+    }, 0);
+}
+</script>
+</body>
+</html>
