@@ -1,9 +1,35 @@
 <html>
 <head>
+<style>
+*{
+  word-wrap: break-word;
+}
+.column{
+  display: inline-block;
+  width: 48%;
+  vertical-align: top;
+}
+</style>
 <script src='https://cdn.jsdelivr.net/npm/bignumber.js@9.0.2/bignumber.min.js'></script>
 <script src="./02.js"></script>
 </head>
 <body>
+<div class="column">
+<div>
+<h3>Convert to Hex:</h3>
+<input id="toHex">
+<br>Result: 0x<span id="toHexResult"></span>
+</div>
+<div>
+<h3>Convert Hex to Little and Big Endian:</h3>
+<input id="toEndian">
+<br>Result Big Endian: <span id="toEndianResultBig"></span>
+<br>Result Little Endian: <span id="toEndianResultLittle"></span>
+</div>
+</div>
+
+<div class="column">
+<h1>Examples</h1>
 <h3>Vector 1</h3>
 <p> Hex: ff00000000000000000000000000000000000000000000000000000000000000</p>
 <p>Bytes: <span id="vector1Bytes"></span></p>
@@ -40,6 +66,7 @@
 <h3>Vector 6 (Vector 2 revert by little endian)</h3>
 <p> Little Endian: 43690</p>
 <p>Hex: <span id="vector6Hex"></span></p>
+</div>
 
 <script>
 const vector1Bytes = document.getElementById("vector1Bytes");
@@ -75,6 +102,21 @@ vector5Hex.innerHTML = converter.toHex('7719354826016761135949426780745810995650
 
 const vector6Hex = document.getElementById("vector6Hex");
 vector6Hex.innerHTML = converter.toHex('43690');
+
+//interactive converter
+const toHex = document.getElementById("toHex");
+const toHexResult = document.getElementById("toHexResult");
+toHex.addEventListener("keyup", () => {
+  toHexResult.innerHTML = converter.toHex(toHex.value);
+});
+
+const toEndian = document.getElementById("toEndian");
+const toEndianResultBig = document.getElementById("toEndianResultBig");
+const toEndianResultLittle = document.getElementById("toEndianResultLittle");
+toEndian.addEventListener("keyup", () => {
+  toEndianResultBig.innerHTML = converter.toBigEndian(toEndian.value);
+  toEndianResultLittle.innerHTML = converter.toLittleEndian(toEndian.value);
+});
 
 </script>
 </body>
