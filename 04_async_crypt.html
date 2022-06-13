@@ -13,7 +13,7 @@
 <hr>
 <div>
     <h3>Encrypt message</h3>
-    <div>Enter your message: <input type="text" id="encryptM"></div>
+    <div>Enter your message (some number): <input type="text" id="encryptM"></div>
     <div>Public Key (green part): <input type="text" id="encrypt1"></div>
     <div>Public Key (blue part): <input type="text" id="encrypt2"></div>
     <button id="encrypt">Encrypt</button>
@@ -46,6 +46,16 @@
         }
         return result;
     }
+    // check for same dividers
+    function isCoprime (a, b) {
+        let num;
+        while ( b ) {
+            num = a % b;
+            a = b;
+            b = num;
+        }
+        return Math.abs(a) === 1;
+    }
 </script>
 <script>
     const generateButton = document.getElementById('generate');
@@ -66,9 +76,9 @@
         const n = p * q;
         const m = (p - 1) * (q - 1);
         let e = 0;
-        let i = 2;
+        let i = 11;
         while (i < m) {
-            if (m % i !== 0) {
+            if (isCoprime(i, m)) {
                 e = i;
                 break;
             }
@@ -95,21 +105,13 @@
 
     encrypt.addEventListener('click', () => {
         console.log(encryptM, encrypt1, encrypt2);
-        encryptR.innerHTML = powerMod(
-            parseInt(encryptM.value),
-            parseInt(encrypt1.value),
-            parseInt(encrypt2.value)
-        ).toString();
+        encryptR.innerHTML = ((BigInt(encryptM.value) ** BigInt(encrypt1.value)) % BigInt(encrypt2.value)).toString();
     });
 
 
     decrypt.addEventListener('click', () => {
         console.log(decryptM, decrypt1, decrypt2);
-        decryptR.innerHTML = powerMod(
-            parseInt(decryptM.value),
-            parseInt(decrypt1.value),
-            parseInt(decrypt2.value)
-        ).toString();
+        decryptR.innerHTML = ((BigInt(decryptM.value) ** BigInt(decrypt1.value)) % BigInt(decrypt2.value)).toString();
     });
 </script>
 </body>
