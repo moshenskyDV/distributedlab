@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+</head>
+<body>
+<h1>RSA async crypt</h1>
+<div>
+    <h3>Generate public/private keys</h3>
+    <button id="generate">Generate keys pair</button>
+    <div>PrivateKey: <span style="color: green;" id="private1"></span> <span style="color: blue;" id="private2"></span></div>
+    <div>PublicKey: <span style="color: green;" id="public1"></span> <span style="color: blue;" id="public2"></span></div>
+</div>
+<hr>
+<div>
+    <h3>Encrypt message</h3>
+    <div>Enter your message: <input type="text" id="encryptM"></div>
+    <div>Public Key (green part): <input type="text" id="encrypt1"></div>
+    <div>Public Key (blue part): <input type="text" id="encrypt2"></div>
+    <button id="encrypt">Encrypt</button>
+    <div>Result hash: <span id="encryptR" style="color: brown;"></span></div>
+</div>
+<hr>
+<div>
+    <h3>Decrypt message</h3>
+    <div>Enter your message hash: <input type="text" id="decryptM"></div>
+    <div>Private Key (green part): <input type="text" id="decrypt1"></div>
+    <div>Private Key (blue part): <input type="text" id="decrypt2"></div>
+    <button id="decrypt">Decrypt</button>
+    <div>Result message: <span id="decryptR" style="color: brown;"></span></div>
+</div>
+<script>
+    //Not mine function (copy-pasted)!!
+    // calculates   base^exponent % modulus
+    function powerMod(base, exponent, modulus) {
+        if (modulus === 1) return 0;
+        var result = 1;
+        console.log(base, exponent, modulus);
+        base = base % modulus;
+        console.log(base, exponent, modulus);
+        while (exponent > 0) {
+            console.log(base, exponent, modulus);
+            if (exponent % 2 === 1)  //odd number
+                result = (result * base) % modulus;
+            exponent = exponent >> 1; //divide by 2
+            base = (base * base) % modulus;
+        }
+        return result;
+    }
+</script>
+<script>
+    const generateButton = document.getElementById('generate');
+    const encrypt = document.getElementById('encrypt');
+    const encryptM = document.getElementById('encryptM');
+    const encrypt1 = document.getElementById('encrypt1');
+    const encrypt2 = document.getElementById('encrypt2');
+    const encryptR = document.getElementById('encryptR');
+    const decrypt = document.getElementById('decrypt');
+    const decryptM = document.getElementById('decryptM');
+    const decrypt1 = document.getElementById('decrypt1');
+    const decrypt2 = document.getElementById('decrypt2');
+    const decryptR = document.getElementById('decryptR');
+
+    generateButton.addEventListener('click', () => {
+        const p = Math.floor(Math.random() * 4 + 8);
+        const q = Math.floor(Math.random() * 4 + 8);
+        const n = p * q;
+        const m = (p - 1) * (q - 1);
+        let e = 0;
+        let i = 2;
+        while (i < m) {
+            if (m % i !== 0) {
+                e = i;
+                break;
+            }
+            i++;
+        }
+
+        let j = 0;
+        let d = 0;
+        do {
+            d = (j * m + 1) / e;
+            j++;
+        } while (!Number.isInteger(d));
+
+        document.getElementById('private1').innerHTML = d.toString();
+        document.getElementById('private2').innerHTML = n.toString();
+        document.getElementById('public1').innerHTML = e.toString();
+        document.getElementById('public2').innerHTML = n.toString();
+        encrypt1.value = e.toString();
+        encrypt2.value = n.toString();
+        decrypt1.value = d.toString();
+        decrypt2.value = n.toString();
+    });
+
+
+    encrypt.addEventListener('click', () => {
+        console.log(encryptM, encrypt1, encrypt2);
+        encryptR.innerHTML = powerMod(
+            parseInt(encryptM.value),
+            parseInt(encrypt1.value),
+            parseInt(encrypt2.value)
+        ).toString();
+    });
+
+
+    decrypt.addEventListener('click', () => {
+        console.log(decryptM, decrypt1, decrypt2);
+        decryptR.innerHTML = powerMod(
+            parseInt(decryptM.value),
+            parseInt(decrypt1.value),
+            parseInt(decrypt2.value)
+        ).toString();
+    });
+</script>
+</body>
+</html>
